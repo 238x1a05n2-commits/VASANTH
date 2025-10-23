@@ -1,0 +1,75 @@
+Question 10: Create a Flutter application using Riverpod state management where pressing a button changes the background color of the appBar and Scaffold, as well as plays one of 10 music notes. 
+
+ 
+
+        
+
+ 
+
+ 
+
+ 
+
+source code:
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:audioplayers/audioplayers.dart';
+
+// Provider for background color state
+final colorProvider = StateProvider<Color>((ref) => Colors.blue);
+
+// Provider for AudioPlayer instance
+final audioPlayerProvider = Provider<AudioPlayer>((ref) => AudioPlayer());
+
+// List of 10 music notes audio assets (you'll need to add actual audio files in assets folder)
+final List<String> musicNotes = [
+  'note1.wav',
+  'note2.wav',
+  'note3.wav',
+  'note4.wav',
+  'note5.wav',
+  'note6.wav',
+  'note7.wav',
+  'note8.wav',
+  'note9.wav',
+  'note10.wav',
+];
+
+void main() {
+  runApp(ProviderScope(child: MyApp()));
+}
+
+class MyApp extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bgColor = ref.watch(colorProvider);
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: bgColor,
+        appBar: AppBar(
+          title: Text('Riverpod Music & Color App'),
+          backgroundColor: bgColor,
+        ),
+        body: Center(
+          child: ElevatedButton(
+            onPressed: () async {
+              // Change background color randomly
+              final randomColor = Colors.primaries[Random().nextInt(Colors.primaries.length)];
+              ref.read(colorProvider.notifier).state = randomColor;
+
+              // Play a random note
+              final player = ref.read(audioPlayerProvider);
+              final randomNote = musicNotes[Random().nextInt(musicNotes.length)];
+
+              // Assuming assets/audio folder, play note
+              await player.play(AssetSource('audio/$randomNote'));
+            },
+            child: Text('Change Color & Play Note'),
+          ),
+        ),
+      ),
+    );
+  }
+}
