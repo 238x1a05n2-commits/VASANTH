@@ -1,0 +1,86 @@
+Create a Provider that provides a list of strings and a function to add new strings to the list. Display the list in another widget.
+SOURCE CODE:
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+// StringListProvider class manages a list of strings
+class StringListProvider with ChangeNotifier {
+  List<String> _strings = [];
+
+  List<String> get strings => _strings;
+
+  void addString(String newString) {
+    _strings.add(newString);
+    notifyListeners();  // Notify listeners about changes
+  }
+}
+
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => StringListProvider(),
+      child: MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: StringListScreen(),
+    );
+  }
+}
+
+class StringListScreen extends StatelessWidget {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    final stringListProvider = Provider.of<StringListProvider>(context);
+
+    return Scaffold(
+      appBar: AppBar(title: Text("Provider List Example")),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            // Input field to add new string
+            TextField(
+              controller: _controller,
+              decoration: InputDecoration(
+                labelText: 'Enter new string',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                final text = _controller.text.trim();
+                if (text.isNotEmpty) {
+                  stringListProvider.addString(text);
+                  _controller.clear();
+                }
+              },
+              child: Text("Add String"),
+            ),
+            SizedBox(height: 20),
+
+            // Display the list of strings
+            Expanded(
+              child: ListView.builder(
+                itemCount: stringListProvider.strings.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(stringListProvider.strings[index]),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
