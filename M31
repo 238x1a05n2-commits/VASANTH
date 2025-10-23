@@ -1,0 +1,134 @@
+ Create a Form with two TextFormFields that require user input and a button to submit the form. Use the Provider package to pass the form data to another widget.
+SOURCE CODE:
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+// Model class to hold form data
+class FormData extends ChangeNotifier {
+  String firstName = '';
+  String lastName = '';
+
+  void setNames(String first, String last) {
+    firstName = first;
+    lastName = last;
+    notifyListeners();
+  }
+}
+
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => FormData(),
+      child: MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: FormScreen(),
+    );
+  }
+}
+
+class FormScreen extends StatefulWidget {
+  @override
+  State<FormScreen> createState() => _FormScreenState();
+}
+
+class _FormScreenState extends State<FormScreen> {
+  final _formKey = GlobalKey<FormState>();
+
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    final formData = Provider.of<FormData>(context);
+
+    return Scaffold(
+      appBar: AppBar(title: Text('Form with Provider')),
+      body: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _firstNameController,
+                    decoration: InputDecoration(labelText: 'First Name'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter first name';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    controller: _lastNameController,
+                    decoration: InputDecoration(labelText: 'Last Name'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter last name';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        // Save form data to Provider
+                        formData.setNames(
+                          _firstNameController.text,
+                          _lastNameController.text,
+                        );
+
+                        // Optionally clear the form
+                        _firstNameController.clear();
+                        _lastNameController.clear();
+
+                        // Navigate to another screen or show data
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => DisplayScreen(),
+                          ),
+                        );
+                      }
+                    },
+                    child: Text('Submit'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DisplayScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final formData = Provider.of<FormData>(context);
+
+    return Scaffold(
+      appBar: AppBar(title: Text('Display Form Data')),
+      body: Center(
+        child: Text(
+          'First Name: ${formData.firstName}\nLast Name: ${formData.lastName}',
+          style: TextStyle(fontSize: 24),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+}
+
