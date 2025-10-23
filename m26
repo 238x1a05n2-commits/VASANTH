@@ -1,0 +1,79 @@
+Question 2: Create an alertDialog form with name, last name, email, and phone number and store all data in shared preferences and show it in UI after submitting the data. What will be your approach to solving this problem statement?
+
+Hint 1:- Use the alert dialog box and textformfield.
+
+Hint 2:- Use the shared preferences library to store the data of all fields.
+source code:
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class AlertDialogForm extends StatefulWidget {
+  @override
+  _AlertDialogFormState createState() => _AlertDialogFormState();
+}
+
+class _AlertDialogFormState extends State<AlertDialogForm> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+
+  String? savedFirstName;
+  String? savedLastName;
+  String? savedEmail;
+  String? savedPhone;
+
+  // Save data to SharedPreferences
+  Future<void> _saveData() async {
+    if (_formKey.currentState!.validate()) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('firstName', _firstNameController.text);
+      await prefs.setString('lastName', _lastNameController.text);
+      await prefs.setString('email', _emailController.text);
+      await prefs.setString('phone', _phoneController.text);
+
+      // Retrieve and update UI
+      _loadData();
+
+      Navigator.of(context).pop(); // Close dialog
+    }
+  }
+
+  // Load saved data
+  Future<void> _loadData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      savedFirstName = prefs.getString('firstName');
+      savedLastName = prefs.getString('lastName');
+      savedEmail = prefs.getString('email');
+      savedPhone = prefs.getString('phone');
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  void _showFormDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Enter Details'),
+          content: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: _firstNameController,
+                    decoration: InputDecoration(labelText: 'First Name'),
+                    validator: (val) =>
+                        val == null || val.isEmpty ? 'Enter first name' : null,
+                  ),
+                  TextFormField(
+                    controller: _lastNameController,
