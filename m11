@@ -1,0 +1,38 @@
+Question 16: How to Show this result based on the given details:
+
+True-answers=6
+Wrong -answers=0
+Total-questions=6
+
+ 
+
+q08-2.png
+
+ 
+
+Hint 1:- Use imageview and textview, containers for showing the image and text.
+
+Hint 2:- Add the logic for showing the result based on true, and false values out of total questions.
+
+SOURCE CODE:
+String getResultMessage(int trueAnswers, int totalQuestions) {
+  if (trueAnswers == totalQuestions) {
+    return "Perfect Score! 🎉";
+  } else if (trueAnswers >= totalQuestions / 2) {
+    return "Good Job!";
+  } else {
+    return "Better Luck Next Time!";
+  }
+}
+
+String getResultImage(int trueAnswers, int totalQuestions) {
+  if (trueAnswers == totalQuestions) {
+    return 'assets/success.png'; // full marks
+  } else if (trueAnswers >= totalQuestions / 2) {
+    return 'assets/okay.png'; // average score
+  } else {
+    return 'assets/fail.png'; // low score
+  }
+}
+
+
