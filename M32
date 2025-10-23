@@ -1,0 +1,83 @@
+Create a simple Provider that provides a counter value and a button to increment the counter. Display the counter value in another widget.
+SOURCE CODE:
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+// Counter class that extends ChangeNotifier
+class Counter with ChangeNotifier {
+  int _count = 0;
+
+  int get count => _count;
+
+  void increment() {
+    _count++;
+    notifyListeners(); // notify listeners to rebuild UI
+  }
+}
+
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => Counter(),
+      child: MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: CounterScreen(),
+    );
+  }
+}
+
+class CounterScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    print("CounterScreen rebuilt"); // Just to track rebuilds
+
+    return Scaffold(
+      appBar: AppBar(title: Text('Provider Counter Example')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CounterDisplay(), // Widget to display counter
+            SizedBox(height: 20),
+            IncrementButton(), // Button to increment counter
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Widget to display the current counter value
+class CounterDisplay extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final counter = Provider.of<Counter>(context);
+
+    return Text(
+      'Counter Value: ${counter.count}',
+      style: TextStyle(fontSize: 28),
+    );
+  }
+}
+
+// Widget with a button to increment the counter
+class IncrementButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final counter = Provider.of<Counter>(context, listen: false);
+
+    return ElevatedButton(
+      onPressed: () {
+        counter.increment();
+      },
+      child: Text('Increment Counter'),
+    );
+  }
+}
